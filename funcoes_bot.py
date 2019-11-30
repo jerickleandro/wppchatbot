@@ -243,8 +243,7 @@ def alterar_sabores(tamanho):
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[0] = sabor
-                        # sabores.pop(0)
-                        # sabores.insert(0,sabor)
+                        
                         return
                     else:
                         print(
@@ -371,13 +370,7 @@ def alterar_extras():
 
 
 def show_cardapio():
-    # """Mostra o cardapio do estabelecimento, arquivado em um .txt"""
-    # cardapio = open('cardapio.txt', 'r')
-    # resposta = ''
-    # for item in cardapio:
-    #     resposta = resposta + item 
-    # bot.responde(resposta)
-    # cardapio.close()
+
     time.sleep(5)
     bot.show_cardapio()
     time.sleep(5)
@@ -616,6 +609,8 @@ menu = {
     19: "TOSCANA",
     20: "ALICHE"
 }
+
+
 tamanho = ''
 sabores = []
 borda = ''

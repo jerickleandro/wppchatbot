@@ -3,27 +3,30 @@ import time
 import re
 import urllib.request
 from selenium import webdriver
-from bs4 import BeautifulSoup
 
 
 class wppbot:
+    #Pega o diretorio onde está salvo o arquivo wppbot.py
     dir_path = os.getcwd()
     
-
+    #Inicia o bot
     def __init__(self, nome_bot):
         print('Iniciado')
+        #salva o perfil para não precisar escanear 
         self.chrome = self.dir_path+'/chromedriver_linux64/chromedriver'
         self.options = webdriver.ChromeOptions()
         self.options.add_argument(
             r"user-data-dir="+self.dir_path+"/profile/wpp")
         self.driver = webdriver.Chrome(
             self.chrome, chrome_options=self.options)
-
+    
+    #Inicia o google chrome
     def inicia(self):
         #self.driver = webdriver.Chrome()
         self.driver.get('https://web.whatsapp.com/')
         self.driver.implicitly_wait(15)
 
+    #esculta as conversas
     def verifica_converca(self):
         try:
             inicia = self.driver.find_elements_by_class_name('_19RFN')
@@ -40,7 +43,6 @@ class wppbot:
             self.verifica_converca()
     
     def escuta(self):
-        
         try:
             
             post = self.driver.find_elements_by_class_name('FTBzM')
