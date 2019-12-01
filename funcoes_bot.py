@@ -9,23 +9,30 @@ def saudacao(primeiraVez):
     global nome
     if(primeiraVez==True):
         resposta = 'Olá, digite seu nome:'
+        print(resposta)
         bot.responde(resposta)
         texto = escuta_resposta(resposta)
-    
+        print(texto)
     while(True):
         if(primeiraVez==True):
             nome = texto
+            print(nome)
             arquivo = '{}.txt'.format(nome)
+            print(arquivo)
             caminho = os.getcwd()
-            verifica = caminho+arquivo
+            print(caminho)
+            verifica = caminho+'/'+arquivo
+            print(verifica)
             check = os.path.exists(verifica)
+            print(check)
             if check:
-                msg = 'Bom te ver de volta '
+                resposta = 'Bom te ver de volta {}, digite o numero referente a opção desejada:'.format(nome)
+
             else:
                 cria = open (arquivo, 'a')
                 cria.write('novo')
                 cria.close()
-            resposta = msg+'{}, digite o numero referente a opção desejada:'.format(nome)
+                resposta = '{}, digite o numero referente a opção desejada:'.format(nome)
             
         else:
             resposta = 'Digite o numero referente a opção desejada:'
