@@ -2,10 +2,11 @@ import wppbot
 import time
 import re
 bot = wppbot.wppbot('Robot')
+import os.path
 
 
 def saudacao(primeiraVez):
-    
+    global nome
     if(primeiraVez==True):
         resposta = 'Olá, digite seu nome:'
         bot.responde(resposta)
@@ -14,7 +15,18 @@ def saudacao(primeiraVez):
     while(True):
         if(primeiraVez==True):
             nome = texto
-            resposta = '{}, digite o numero referente a opção desejada:'.format(nome)
+            arquivo = '{}.txt'.format(nome)
+            caminho = os.getcwd()
+            verifica = caminho+arquivo
+            check = os.path.exists(verifica)
+            if check:
+                msg = 'Bom te ver de volta '
+            else:
+                cria = open (arquivo, 'a')
+                cria.write('novo')
+                cria.close()
+            resposta = msg+'{}, digite o numero referente a opção desejada:'.format(nome)
+            
         else:
             resposta = 'Digite o numero referente a opção desejada:'
         bot.responde(resposta)
@@ -617,7 +629,7 @@ borda = ''
 refri = ''
 borders = ['Catupiry', 'Cheddar', 'Calabresa', 'Queijo', 'Nutela']
 refrigerante = ['Coca-cola', 'Fanta', 'Sprite', 'Kuat', 'Guaraná Antartica']
-
+nome = ''
 bot.inicia()
 while(True):
     

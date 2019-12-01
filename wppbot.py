@@ -70,7 +70,7 @@ class wppbot:
             self.botao_anexo.click()
             #self.driver.implicitly_wait(5)
             self.busca_anexo = self.driver.find_element_by_css_selector("input[type='file']")
-            self.dir_path = self.dir_path+"/cardapio.png"
+            self.dir_path = self.dir_path+"/cardapio.jpeg"
             self.busca_anexo.send_keys(self.dir_path)
             #self.driver.implicitly_wait(5)
             #self.enviar_anexo = self.driver.find_element_by_css_selector("span[data-icon='send-light']")
