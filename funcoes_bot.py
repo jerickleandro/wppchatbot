@@ -530,8 +530,8 @@ def more_options():
         for i in range(len(refrigerante)):
             resposta = '({}) - {}'.format(i,refrigerante[i])
             bot.responde(resposta)
-        r = int(input())
-        if r >= 0 and r < len(borders):
+        r = int(escuta_resposta(resposta))
+        if r >= 0 and r < len(borders): 
             refri = refrigerante[r]
         else:
             bot.responde('Essa opção de borda não existe')
@@ -585,20 +585,37 @@ def valor_total(tamanho, sabores, borda, refri):
 
 def payment():
 
-    opt_payment = int(
-        input('Qual a forma de pagamento:\n(1) Dinheiro\n(2) Cartão'))
+    resposta = 'Qual a forma de pagamento:\n(1) Dinheiro\n(2) Cartão'
+    bot.responde(resposta)
+    opt_payment = int(escuta_resposta('(2) Cartão'))
     if opt_payment == 1:
-        pay_back = input('Deseja troco?\n(1) SIM\n(2) NÃO')
-        if pay_back == '1':
-            print('Para quanto deseja o troco?')
-            client_money = float(input())
-            print('O troco será: R${}'.format(client_money -
-                                              (valor_total(tamanho, sabores, borda, refri))))
-            print('Agradecemos sua preferência!')
+        
+        resposta = 'Deseja troco?\n(1) SIM\n(2) NÃO'
+        bot.responde(resposta)
+        pay_back = int(escuta_resposta('(2) NÃO'))
+        if pay_back == 1:
+            resposta = 'Para quanto deseja o troco?'
+            bot.responde(resposta)
+            client_money = float(escuta_resposta('Para quanto deseja o troco?'))
+            resposta = 'O troco será: R${}'.format(client_money - (valor_total(tamanho, sabores, borda, refri)))
+            bot.responde(resposta)
+            recebe_endereco()
+    elif opt_payment == 2: 
+        bot.responde('O motoboy levará a máquineta para o pagamento no ato da entrega!')
+        recebe_endereco()
     else:
-        print('O motoboy levará a máquineta para o pagamento no ato da entrega!')
-        print('Agradecemos sua preferência!')
+        bot.responde('Ops! Digite apenas o número referente ao pagamento')
+        payment()
+    
+def recebe_endereco():
+    global endereco
+    resposta = 'Por ultimo, escreva seu endereço completo com numero, rua, complemento e ponto de localização.'
+    bot.responde(resposta)
+    endereco = escuta_resposta(resposta)
 
+def finalizacao():
+    resposta = 'Pedido concluido com sucesso! Nós agradecemos sua confiança.'
+    bot.responde(resposta)
 
 def escuta_resposta(resposta):
     while(True):
@@ -638,11 +655,12 @@ refri = ''
 borders = ['Catupiry', 'Cheddar', 'Calabresa', 'Queijo', 'Nutela']
 refrigerante = ['Coca-cola', 'Fanta', 'Sprite', 'Kuat', 'Guaraná Antartica']
 nome = ''
+endereco = ''
 bot.inicia()
 while(True):
     
     texto = str(bot.escuta())
-    if(texto == 'Fala bot!'):
+    if(texto == 'Boa noite!'):
         saudacao(True) 
     
     # bot.verifica_converca()
