@@ -58,7 +58,7 @@ class wppbot:
             response = str(resposta)
             self.caixa_de_mensagem = self.driver.find_element_by_class_name('_3FeAD')
             self.caixa_de_mensagem.send_keys(response)
-            time.sleep(1)
+            #time.sleep(1)
             self.botao_enviar = self.driver.find_element_by_class_name('_3M-N-')
             self.botao_enviar.click()
         except:
