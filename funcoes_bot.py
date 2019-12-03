@@ -3,7 +3,10 @@ import time
 import re
 bot = wppbot.wppbot('Robot')
 import os.path
+from gui import *
+import bd as core
 
+app = None
 
 def saudacao(primeiraVez):
     global nome
@@ -563,6 +566,7 @@ def total_pedido():
     bot.responde('O seu pedido está correto?\n(1) SIM\n(2) NÃO')
     answer = int(escuta_resposta('(2) NÃO'))
     if answer == 1:
+        
         return payment()
     else:
         return alteracao_pedido()
@@ -612,10 +616,38 @@ def recebe_endereco():
     resposta = 'Por ultimo, escreva seu endereço completo com numero, rua, complemento e ponto de localização.'
     bot.responde(resposta)
     endereco = escuta_resposta(resposta)
+    finalizacao()
 
+    
 def finalizacao():
+    global tamanho
+    global sabores
+    global borders
+    global borda
+    global refrigerante
+    global refri
+    global menu
+    global endereco
+    
+    print('Entrou na finalização de pedido')
+    if len(sabores)==1:
+        sabor1 = sabores[0]
+        sabor2 = None
+        sabor3 = None
+    elif len(sabores)==2:
+        sabor1 = sabores[0]
+        sabor2 = sabores[1]
+        sabor3 = None
+    else:
+        sabor1 = sabores[0]
+        sabor2 = sabores[1]
+        sabor3 = sabores[2]
+
+        core.insert(nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco)
+        view_command()
     resposta = 'Pedido concluido com sucesso! Nós agradecemos sua confiança.'
     bot.responde(resposta)
+    app.run()
 
 def escuta_resposta(resposta):
     while(True):
@@ -623,6 +655,58 @@ def escuta_resposta(resposta):
         #re.match(r'^#', resposta)
         if(texto != resposta):
             return texto
+
+
+def view_command():
+    rows = core.view()
+    app.listPedidos.delete(0, END)
+    for r in rows:
+        app.listPedidos.insert(END, r)
+
+def search_command():
+    app.listPedidos.delete(0, END)
+    rows = core.search(app.txtNome.get())
+    for r in rows:
+        app.listPedidos.insert(END, r)
+
+def insert_command():
+    core.insert(app.txtNome.get(), app.txtTamanho.get(), app.txtSabor1.get(), app.txtSabor2.get(), app.txtSabor3.get(), app.txtRefri.get(), app.txtBorda.get(), app.txtEndereco.get())
+    view_command()
+
+def update_command():
+    core.update(selected[0],app.txtNome.get(), app.txtTamanho.get(), app.txtSabor1.get(), app.txtSabor2.get(), app.txtSabor3.get(), app.txtRefri.get(), app.txtBorda.get(), app.txtEndereco.get())
+    view_command()
+
+def del_command():
+    id = selected[0]
+    core.delete(id)
+    view_command()
+
+
+def getSelectedRow(event):
+    global selected
+    index = app.listPedidos.curselection()[0]
+    selected = app.listPedidos.get(index)
+    app.entNome.delete(0, END)
+    app.entNome.insert(END, selected[1])
+    app.entTamanho.delete(0, END)
+    app.entTamanho.insert(END, selected[2])
+    app.entSabor1.delete(0, END)
+    app.entSabor1.insert(END, selected[3])
+    app.entSabor2.delete(0, END)
+    app.entSabor2.insert(END, selected[4])
+    app.entSabor3.delete(0, END)
+    app.entSabor3.insert(END, selected[5])
+    app.entRefri.delete(0, END)
+    app.entRefri.insert(END, selected[6])
+    app.entBorda.delete(0, END)
+    app.entBorda.insert(END, selected[7])
+    app.entEndereco.delete(0, END)
+    app.entEndereco.insert(END, selected[8])
+    return selected
+
+
+
 
 menu = {
     1: "AMERICANA",
@@ -656,8 +740,25 @@ borders = ['Catupiry', 'Cheddar', 'Calabresa', 'Queijo', 'Nutela']
 refrigerante = ['Coca-cola', 'Fanta', 'Sprite', 'Kuat', 'Guaraná Antartica']
 nome = ''
 endereco = ''
+
+
+
+
 bot.inicia()
+app = Gui()
+app.listPedidos.bind('<<ListboxSelect>>', getSelectedRow)
+
+app.btnViewAll.configure(command=view_command)
+app.btnBuscar.configure(command=search_command)
+app.btnInserir.configure(command=insert_command)
+app.btnUpdate.configure(command=update_command)
+app.btnDel.configure(command=del_command)
+app.btnClose.configure(command=app.window.destroy)
+
+
+
 while(True):
+    
     
     texto = str(bot.escuta())
     if(texto == 'Boa noite!'):
