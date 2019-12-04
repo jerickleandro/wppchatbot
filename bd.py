@@ -78,13 +78,22 @@ def view():
 #     rows = trans.fetchall()
 #     trans.disconnect()
 #     return rows
-def search(nome=""):
+def search(nome="", tamanho="", sabor1="",sabor2="",sabor3="",refri="",borda="",endereco=""):
     trans = TransactionObject()
     trans.connect()
-    trans.execute("SELECT * FROM pedidos WHERE nome=?", (nome))
+    trans.execute("SELECT * FROM pedidos WHERE nome=? or tamanho=?  or sabor1=?  or sabor2=?  or sabor3=?  or refri=?  or borda=?  or endereco=?" , (nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco))
     rows = trans.fetchall()
     trans.disconnect()
     return rows
+
+# def search2(nome):
+#     trans = TransactionObject()
+#     trans.connect()
+#     consulta = "SELECT * FROM pedidos WHERE nome={}".format(nome)
+#     trans.execute(consulta)
+#     rows = trans.fetchall()
+#     trans.disconnect()
+#     return rows
 
 
 def delete(id):

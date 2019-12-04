@@ -25,7 +25,9 @@ class wppbot:
         #self.driver = webdriver.Chrome()
         self.driver.get('https://web.whatsapp.com/')
         self.driver.implicitly_wait(15)
-
+        
+    def fecha(self):
+        self.driver.close()
     #esculta as conversas
     def verifica_converca(self):
         try:
