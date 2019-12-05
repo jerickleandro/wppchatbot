@@ -1,15 +1,15 @@
-import wppbot
+import wppbot as wpp
 import time
 import re
-bot = wppbot.wppbot('Robot')
 import os.path
 from gui import *
 import bd as core
-
+bot = wpp.wppbot('Robot')
 app = None
 
-def saudacao(primeiraVez):
+def saudacao(primeiraVez,vezes):
     global nome
+    condicao = vezes
     if(primeiraVez==True):
         resposta = 'Olá, digite seu nome:'
         print(resposta)
@@ -52,8 +52,12 @@ def saudacao(primeiraVez):
         elif (op == '3'):
             return mais_opcoes()
         else:
-            print('Essa opção não existe')
-            saudacao(False)
+            if(condicao <3):
+                bot.responde('Essa opção não existe')
+                vezes+=1
+                saudacao(False,vezes)
+            else:
+                falar_com_atendente()
 
 
 def novo_pedido():
@@ -386,10 +390,10 @@ def mais_opcoes():
         bot.responde('2 - Voltar para as opções')
         op = int(escuta_resposta('2 - Voltar para as opções'))
         if(op == 1):
-            bot.responde('Aguarde, a atendente humana entrará já falará com você.')
-            return saudacao(False)
+            
+            return falar_com_atendente()
         elif(op == 2):
-            return saudacao(False)
+            return saudacao(False,0)
         else:
             bot.responde('Essa opção não é válida')
             return mais_opcoes()
@@ -628,6 +632,7 @@ def recebe_endereco():
 
     
 def finalizacao():
+    global nome
     global tamanho
     global sabores
     global borders
@@ -640,12 +645,12 @@ def finalizacao():
     print('Entrou na finalização de pedido')
     if len(sabores)==1:
         sabor1 = sabores[0]
-        sabor2 = None
-        sabor3 = None
+        sabor2 = 'None'
+        sabor3 = 'None'
     elif len(sabores)==2:
         sabor1 = sabores[0]
         sabor2 = sabores[1]
-        sabor3 = None
+        sabor3 = 'None'
     else:
         sabor1 = sabores[0]
         sabor2 = sabores[1]
@@ -654,6 +659,30 @@ def finalizacao():
         core.insert(nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco)
         view_command()
     resposta = 'Pedido concluido com sucesso! Nós agradecemos sua confiança.'
+    bot.responde(resposta)
+    app.run()
+
+def falar_com_atendente():
+    global nome
+    global tamanho
+    global sabores
+    global borders
+    global borda
+    global refrigerante
+    global refri
+    global menu
+    global endereco
+    tamanho = 'none'
+    sabor1 = 'none'
+    sabor2 = 'none'
+    sabor3 = 'none'
+    refri = 'none'
+    borda = 'none'
+    endereco = 'Esperando falar com atendentes'
+
+    core.insert(nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco)
+    view_command()
+    resposta = 'Em breve o atendente irá falar com você'
     bot.responde(resposta)
     app.run()
 
@@ -770,7 +799,7 @@ while(True):
     
     texto = str(bot.escuta())
     if(texto == 'Boa noite!'):
-        saudacao(True) 
+        saudacao(True,0) 
     
 print('Deseja finalizar o programa?\n1 - Sim.\n2 - Não')
 op = int(input())
