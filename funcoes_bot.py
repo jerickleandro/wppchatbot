@@ -1,20 +1,42 @@
-import wppbot
+import wppbot as wpp
 import time
 import re
-bot = wppbot.wppbot('Robot')
+import os.path
+from gui import *
+import bd as core
+bot = wpp.wppbot('Robot')
+app = None
 
-
-def saudacao(primeiraVez):
-    
+def saudacao(primeiraVez,vezes):
+    global nome
+    condicao = vezes
     if(primeiraVez==True):
         resposta = 'Olá, digite seu nome:'
+        print(resposta)
         bot.responde(resposta)
         texto = escuta_resposta(resposta)
-    
+        print(texto)
     while(True):
         if(primeiraVez==True):
             nome = texto
-            resposta = '{}, digite o numero referente a opção desejada:'.format(nome)
+            print(nome)
+            arquivo = '{}.txt'.format(nome)
+            print(arquivo)
+            caminho = os.getcwd()
+            print(caminho)
+            verifica = caminho+'/'+arquivo
+            print(verifica)
+            check = os.path.exists(verifica)
+            print(check)
+            if check:
+                resposta = 'Bom te ver de volta {}, digite o numero referente a opção desejada:'.format(nome)
+
+            else:
+                cria = open (arquivo, 'a')
+                cria.write('novo')
+                cria.close()
+                resposta = '{}, digite o numero referente a opção desejada:'.format(nome)
+            
         else:
             resposta = 'Digite o numero referente a opção desejada:'
         bot.responde(resposta)
@@ -30,8 +52,12 @@ def saudacao(primeiraVez):
         elif (op == '3'):
             return mais_opcoes()
         else:
-            print('Essa opção não existe')
-            saudacao(False)
+            if(condicao <3):
+                bot.responde('Essa opção não existe')
+                vezes+=1
+                saudacao(False,vezes)
+            else:
+                falar_com_atendente()
 
 
 def novo_pedido():
@@ -50,7 +76,7 @@ def novo_pedido():
                 return um_sabor(option)
 
             elif option == 2:
-                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n'
+                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores'
                 bot.responde(resposta)
                 opt_sabor = escuta_resposta('(2) 2 Sabores')
                 if opt_sabor == 1:
@@ -59,7 +85,7 @@ def novo_pedido():
                     return dois_sabores(option)
 
             elif option == 3:
-                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n(3) 3 Sabores\n'
+                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n(3) 3 Sabores'
                 bot.responde(resposta)
                 opt_sabor = escuta_resposta('(3) 3 Sabores')
                 
@@ -75,7 +101,7 @@ def novo_pedido():
                 return um_sabor(option)
 
             elif option == 'MEDIA':
-                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n'
+                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores'
                 bot.responde(resposta)
                 opt_sabor = escuta_resposta('(2) 2 Sabores')
                 if opt_sabor == 1:
@@ -84,7 +110,7 @@ def novo_pedido():
                     return dois_sabores(option)
 
             elif option == 'GRANDE':
-                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n(3) 3 Sabores\n'
+                resposta = 'Deseja sua pizza com quantos sabores?\n(1) 1 Sabor\n(2) 2 Sabores\n(3) 3 Sabores'
                 bot.responde(resposta)
                 opt_sabor = escuta_resposta('(3) 3 Sabores')
                 
@@ -99,12 +125,12 @@ def novo_pedido():
 def alteracao_pedido():
     global tamanho
     global sabores
-    print('O que você deseja alterar?\nDigite o numero referente a opção desejada')
+    bot.responde('O que você deseja alterar?\nDigite o numero referente a opção desejada')
 
-    print('(1) - Alterar tamanho')
-    print('(2) - Alterar sabores')
-    print('(3) - Alterar extras')
-    op = input()
+    bot.responde('(1) - Alterar tamanho')
+    bot.responde('(2) - Alterar sabores')
+    bot.responde('(3) - Alterar extras')
+    op = escuta_resposta('(3) - Alterar extras')
     if(op == '1'):
         return alterar_tamanho()
     elif(op == '2'):
@@ -112,26 +138,29 @@ def alteracao_pedido():
     elif(op == '3'):
         return alterar_extras()
     else:
-        print('Essa opção não existe')
+        bot.responde('Essa opção não existe')
         alteracao_pedido()
 
 
 def alterar_tamanho():
     global tamanho
-    print('Para qual tamanho deseja alterar? Digite a opção desejada:')
-    print('1 - Pequena\n2 - Média\n3 - Grande')
-    op = input()
+    bot.responde('Para qual tamanho deseja alterar? Digite a opção desejada:')
+    bot.responde('1 - Pequena\n2 - Média\n3 - Grande')
+    op = escuta_resposta('3 - Grande')
     if(op == '1'):
         tamanho = 'Pequena'
-        return
+        bot.responde('Tamanho alterado para pequeno')
+        return total_pedido()
     elif(op == '2'):
         tamanho = 'Media'
-        return
+        bot.responde('Tamanho alterado para medio')
+        return total_pedido()
     elif(op == '3'):
         tamanho = 'Grande'
-        return
+        bot.responde('Tamanho alterado para grande')
+        return total_pedido()
     else:
-        print('Essa opção não existe')
+        bot.responde('Essa opção não existe')
         alterar_tamanho()
 
 
@@ -139,210 +168,214 @@ def alterar_sabores(tamanho):
     global menu
     global sabores
     if tamanho == 'Pequena':
-        show_cardapio()
-        print('Escolha o numero referente a novo sabor:')
+        
+        bot.responde('Escolha o numero referente a novo sabor:')
         while(True):
-            sabor = input()
+            sabor = escuta_resposta('Escolha o numero referente a novo sabor:')
             escolha = int(sabor)
             if escolha in menu:
                 sabores[0] = sabor
-                return
+                return total_pedido()
             else:
-                print(
+                bot.responde(
                     'Essa opção não está dentro das opções do menu. Escolha novamente:')
     elif tamanho == 'Media':
         if len(sabores) == 1:
-            show_cardapio()
-            print('Escolha o numero referente a novo sabor:')
+            
+            bot.responde('Escolha o numero referente a novo sabor:')
             while(True):
-                sabor = input()
+                sabor = escuta_resposta('Escolha o numero referente a novo sabor:')
                 escolha = int(sabor)
                 if escolha in menu:
                     sabores[0] = sabor
-                    return
+                    return total_pedido()
                 else:
-                    print(
+                    bot.responde(
                         'Essa opção não está dentro das opções do menu. Escolha novamente:')
         elif len(sabores) == 2:
-            print('Você quer alterar qual sabor:')
+            bot.responde('Você quer alterar qual sabor:')
             saborum = int(sabores[0])
             sabordois = int(sabores[1])
-            print('(1) - {} '.format(menu[saborum]))
-            print('(2) - {} '.format(menu[sabordois]))
-            print('(3) - Os dois sabores')
-            op = input()
+            bot.responde('(1) - {} '.format(menu[saborum]))
+            bot.responde('(2) - {} '.format(menu[sabordois]))
+            bot.responde('(3) - Os dois sabores')
+            op = escuta_resposta('(3) - Os dois sabores')
             if(op == '1'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[0] = sabor
-                        return
+                        
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
+                return total_pedido()
             elif(op == '2'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[1] = sabor
-                        return
+                        
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
+                return total_pedido()
             elif(op == '3'):
                 i = 0
                 while(i < 2):
-                    show_cardapio()
-                    print('Escolha seu {}º novo sabor'.format(i+1))
+                    
+                    bot.responde('Escolha seu {}º novo sabor'.format(i+1))
 
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu {}º novo sabor'.format(i+1))
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[i] = sabor
                         i += 1
+                        
                     else:
-                        print(
-                            'Essa opção não está dentro das opções do menu. Escolha novamente:')
+                        bot.responde('Essa opção não está dentro das opções do menu. Escolha novamente:')
+                return total_pedido()
             else:
-                print('Opção invalida')
+                bot.responde('Opção invalida')
                 alterar_sabores(tamanho)
     elif tamanho == 'Grande':
         if len(sabores) == 1:
-            print('Escolha o numero referente a novo sabor:')
-            show_cardapio()
+            bot.responde('Escolha o numero referente a novo sabor:')
+            
             while(True):
-                sabor = input()
+                sabor = escuta_resposta('Escolha o numero referente a novo sabor:')
                 escolha = int(sabor)
                 if escolha in menu:
                     sabores.pop(0)
                     sabores.insert(0, sabor)
-                    return
+                    return total_pedido()
                 else:
-                    print(
+                    bot.responde(
                         'Essa opção não está dentro das opções do menu. Escolha novamente:')
 
         elif len(sabores) == 2:
-            print('Você quer alterar qual sabor:')
+            bot.responde('Você quer alterar qual sabor:')
             saborum = int(sabores[0])
             sabordois = int(sabores[1])
             print('(1) - {} '.format(menu[saborum]))
             print('(2) - {} '.format(menu[sabordois]))
             print('(3) - OS DOIS SABORES')
-            op = input()
+            op = escuta_resposta('(3) - OS DOIS SABORES')
             if(op == '1'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[0] = sabor
-                        # sabores.pop(0)
-                        # sabores.insert(0,sabor)
-                        return
+                        
+                        return total_pedido()
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
             elif(op == '2'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[1] = sabor
-                        return
+                        return total_pedido()
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
             elif(op == '3'):
                 i = 0
                 while(i < 2):
-                    show_cardapio()
-                    print('Escolha seu {}º novo sabor'.format(i+1))
+                    
+                    bot.responde('Escolha seu {}º novo sabor'.format(i+1))
 
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu {}º novo sabor'.format(i+1))
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[i] = sabor
                         i += 1
-
+                        
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
-
+                return total_pedido()
             else:
-                print('Opção invalida')
+                bot.responde('Opção invalida')
                 alterar_sabores(tamanho)
         elif len(sabores) == 3:
-            print('Você quer alterar qual sabor:')
+            bot.responde('Você quer alterar qual sabor:')
             saborum = int(sabores[0])
             sabordois = int(sabores[1])
             sabortres = int(sabores[2])
-            print('(1) - {} '.format(menu[saborum]))
-            print('(2) - {} '.format(menu[sabordois]))
-            print('(3) - {} '.format(menu[sabortres]))
-            print('(4) - OS TRÊS SABORES')
-            op = input()
+            bot.responde('(1) - {} '.format(menu[saborum]))
+            bot.responde('(2) - {} '.format(menu[sabordois]))
+            bot.responde('(3) - {} '.format(menu[sabortres]))
+            bot.responde('(4) - OS TRÊS SABORES')
+            op = escuta_resposta('(4) - OS TRÊS SABORES')
             if(op == '1'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = ('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[0] = sabor
-                        return
+                        return total_pedido()
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
             elif(op == '2'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[1] = sabor
-                        return
+                        return total_pedido()
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
             elif(op == '3'):
-                show_cardapio()
-                print('Escolha seu novo sabor')
+                
+                bot.responde('Escolha seu novo sabor')
                 while(True):
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu novo sabor')
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[2] = sabor
-                        return
+                        return total_pedido()
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
             elif(op == '4'):
                 i = 0
                 while(i < 3):
-                    show_cardapio()
-                    print('Escolha seu {}º novo sabor'.format(i+1))
+                    
+                    bot.responde('Escolha seu {}º novo sabor'.format(i+1))
 
-                    sabor = input()
+                    sabor = escuta_resposta('Escolha seu {}º novo sabor'.format(i+1))
                     escolha = int(sabor)
                     if escolha in menu:
                         sabores[i] = sabor
                         i += 1
+                    
+                        
                     else:
-                        print(
+                        bot.responde(
                             'Essa opção não está dentro das opções do menu. Escolha novamente:')
-
+                return total_pedido()
             else:
-                print('Opção invalida')
+                bot.responde('Opção invalida')
                 alterar_sabores(tamanho)
 
 
@@ -357,27 +390,21 @@ def mais_opcoes():
         bot.responde('2 - Voltar para as opções')
         op = int(escuta_resposta('2 - Voltar para as opções'))
         if(op == 1):
-            bot.responde('Aguarde, a atendente humana entrará já falará com você.')
-            return saudacao(False)
+            
+            return falar_com_atendente()
         elif(op == 2):
-            return saudacao(False)
+            return saudacao(False,0)
         else:
             bot.responde('Essa opção não é válida')
             return mais_opcoes()
 
 
 def alterar_extras():
-    return
+    return more_options()
 
 
 def show_cardapio():
-    # """Mostra o cardapio do estabelecimento, arquivado em um .txt"""
-    # cardapio = open('cardapio.txt', 'r')
-    # resposta = ''
-    # for item in cardapio:
-    #     resposta = resposta + item 
-    # bot.responde(resposta)
-    # cardapio.close()
+
     time.sleep(5)
     bot.show_cardapio()
     time.sleep(5)
@@ -405,7 +432,7 @@ def um_sabor(option):
                 sabores.append(sabor_0)
                 break
         else:
-            bot.responde('Ops! Digite apenas o número referente ao sabor:\n')
+            bot.responde('Ops! Digite apenas o número referente ao sabor:')
     return more_options()
 
 
@@ -419,7 +446,8 @@ def dois_sabores(option):
     elif option == 3:
         tamanho = 'Grande'
     show_cardapio()
-    while (True):
+    flag = True
+    while (flag):
         
         bot.responde('Insira o numero referente ao primeiro sabor desejado:')
         sabor_1 = escuta_resposta('Insira o numero referente ao primeiro sabor desejado:')
@@ -427,20 +455,19 @@ def dois_sabores(option):
         if sabor_1.isnumeric():
             escolha = int(sabor_1)
             if escolha in menu:
-                sabores.append(sabor_1)
-                break
-            bot.responde('Insira o numero referente ao segundo sabor desejado:\n')
+                sabores.append(sabor_1)    
+            bot.responde('Insira o numero referente ao segundo sabor desejado:')
             sabor_2 = escuta_resposta('Insira o numero referente ao segundo sabor desejado:')
             # Validando se o valor do sabor_2 eh um numero para poder adicionar ao pedido
             if sabor_2.isnumeric():
                 escolha = int(sabor_2)
                 if escolha in menu:
                     sabores.append(sabor_2)
-                    break
+                    flag = False
             else:
-                bot.responde('Ops! Digite apenas o número referente ao sabor:\n')
+                bot.responde('Ops! Digite apenas o número referente ao sabor:')
         else:
-            bot.responde('Ops! Digite apenas o número referente ao sabor:\n')
+            bot.responde('Ops! Digite apenas o número referente ao sabor:')
         # Condicao de parada do loop
         # if len(sabores) == 2:
         #     more_options()
@@ -455,7 +482,8 @@ def tres_sabores():
     tamanho = 'Grande'
     global sabores
     show_cardapio()
-    while (True):
+    flag = True
+    while (flag):
         bot.responde('Insira o numero referente ao primeiro sabor desejado:')
         sabor_1 = escuta_resposta('Insira o numero referente ao primeiro sabor desejado:')
         # Validando se o valor do sabor_1 eh um numero para poder ser adicionado ao pedido
@@ -463,20 +491,19 @@ def tres_sabores():
             escolha = int(sabor_1)
             if escolha in menu:
                 sabores.append(sabor_1)
-                break
+                
         
 
-        bot.responde('Insira o numero referente ao segundo sabor desejado:\n')
+        bot.responde('Insira o numero referente ao segundo sabor desejado:')
         sabor_2 = escuta_resposta('Insira o numero referente ao segundo sabor desejado:')
             # Validando se o valor do sabor_2 eh um numero para poder adicionar ao pedido
         if sabor_2.isnumeric():
             escolha = int(sabor_2)
             if escolha in menu:
                 sabores.append(sabor_2)
-                break
+                
         else:
-            bot.responde('Ops! Digite apenas o número referente ao sabor:\n')
-    while (True):
+            bot.responde('Ops! Digite apenas o número referente ao sabor:')
         bot.responde('Insira o numero referente ao terceiro sabor desejado:')
         sabor_3 = escuta_resposta('Insira o numero referente ao terceiro sabor desejado:')
         
@@ -485,9 +512,10 @@ def tres_sabores():
             escolha = int(sabor_3)
             if escolha in menu:
                 sabores.append(sabor_3)
-                break
+                flag = False
+                
         else:
-            bot.responde('Ops! Digite apenas o número referente ao sabor:\n')
+            bot.responde('Ops! Digite apenas o número referente ao sabor:')
     return more_options()
 
 
@@ -497,7 +525,7 @@ def more_options():
     global borda
     global refri
     
-    bot.responde('Deseja adicionar borda?\n(1) SIM\n(2) NÃO\n')
+    bot.responde('Deseja adicionar borda?\n(1) SIM\n(2) NÃO')
     opt_border = int(escuta_resposta('(2) NÃO'))
     if opt_border == 1:
         bot.responde('Escolha o recheio da borda:')
@@ -510,15 +538,15 @@ def more_options():
         else:
             bot.responde('Essa opção de borda não existe')
     
-    bot.responde('Deseja adicionar alguma bebida ao seu pedido?\n(1) SIM\n(2) NÃO\n')
-    more_add = int(escuta_resposta('(2) NÃO)'))
+    bot.responde('Deseja adicionar alguma bebida ao seu pedido?\n(1) SIM\n(2) NÃO')
+    more_add = int(escuta_resposta('(2) NÃO'))
     if(more_add == 1):
         bot.responde('Escolha o seu refrigerante:')
         for i in range(len(refrigerante)):
             resposta = '({}) - {}'.format(i,refrigerante[i])
             bot.responde(resposta)
-        r = int(input())
-        if r >= 0 and r < len(borders):
+        r = int(escuta_resposta(resposta))
+        if r >= 0 and r < len(borders): 
             refri = refrigerante[r]
         else:
             bot.responde('Essa opção de borda não existe')
@@ -547,9 +575,10 @@ def total_pedido():
         bot.responde(refri)
     bot.responde('Valor total: R$ {}'.format(
         valor_total(tamanho, sabores, borda, refri)))
-    bot.responde('O seu pedido está correto?\n(1) SIM\n(2) NÃO\n')
+    bot.responde('O seu pedido está correto?\n(1) SIM\n(2) NÃO')
     answer = int(escuta_resposta('(2) NÃO'))
     if answer == 1:
+        
         return payment()
     else:
         return alteracao_pedido()
@@ -572,20 +601,90 @@ def valor_total(tamanho, sabores, borda, refri):
 
 def payment():
 
-    opt_payment = int(
-        input('Qual a forma de pagamento:\n(1) Dinheiro\n(2) Cartão\n'))
+    resposta = 'Qual a forma de pagamento:\n(1) Dinheiro\n(2) Cartão'
+    bot.responde(resposta)
+    opt_payment = int(escuta_resposta('(2) Cartão'))
     if opt_payment == 1:
-        pay_back = input('Deseja troco?\n(1) SIM\n(2) NÃO\n')
-        if pay_back == '1':
-            print('Para quanto deseja o troco?')
-            client_money = float(input())
-            print('O troco será: R${}'.format(client_money -
-                                              (valor_total(tamanho, sabores, borda, refri))))
-            print('Agradecemos sua preferência!')
+        
+        resposta = 'Deseja troco?\n(1) SIM\n(2) NÃO'
+        bot.responde(resposta)
+        pay_back = int(escuta_resposta('(2) NÃO'))
+        if pay_back == 1:
+            resposta = 'Para quanto deseja o troco?'
+            bot.responde(resposta)
+            client_money = float(escuta_resposta('Para quanto deseja o troco?'))
+            resposta = 'O troco será: R${}'.format(client_money - (valor_total(tamanho, sabores, borda, refri)))
+            bot.responde(resposta)
+            recebe_endereco()
+    elif opt_payment == 2: 
+        bot.responde('O motoboy levará a máquineta para o pagamento no ato da entrega!')
+        recebe_endereco()
     else:
-        print('O motoboy levará a máquineta para o pagamento no ato da entrega!')
-        print('Agradecemos sua preferência!')
+        bot.responde('Ops! Digite apenas o número referente ao pagamento')
+        payment()
+    
+def recebe_endereco():
+    global endereco
+    resposta = 'Por ultimo, escreva seu endereço completo com numero, rua, complemento e ponto de localização.'
+    bot.responde(resposta)
+    endereco = escuta_resposta(resposta)
+    finalizacao()
 
+    
+def finalizacao():
+    global nome
+    global tamanho
+    global sabores
+    global borders
+    global borda
+    global refrigerante
+    global refri
+    global menu
+    global endereco
+    
+    print('Entrou na finalização de pedido')
+    if len(sabores)==1:
+        sabor1 = sabores[0]
+        sabor2 = 'None'
+        sabor3 = 'None'
+    elif len(sabores)==2:
+        sabor1 = sabores[0]
+        sabor2 = sabores[1]
+        sabor3 = 'None'
+    else:
+        sabor1 = sabores[0]
+        sabor2 = sabores[1]
+        sabor3 = sabores[2]
+
+        core.insert(nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco)
+        view_command()
+    resposta = 'Pedido concluido com sucesso! Nós agradecemos sua confiança.'
+    bot.responde(resposta)
+    app.run()
+
+def falar_com_atendente():
+    global nome
+    global tamanho
+    global sabores
+    global borders
+    global borda
+    global refrigerante
+    global refri
+    global menu
+    global endereco
+    tamanho = 'none'
+    sabor1 = 'none'
+    sabor2 = 'none'
+    sabor3 = 'none'
+    refri = 'none'
+    borda = 'none'
+    endereco = 'Esperando falar com atendentes'
+
+    core.insert(nome,tamanho,sabor1,sabor2,sabor3,refri,borda,endereco)
+    view_command()
+    resposta = 'Em breve o atendente irá falar com você'
+    bot.responde(resposta)
+    app.run()
 
 def escuta_resposta(resposta):
     while(True):
@@ -593,6 +692,58 @@ def escuta_resposta(resposta):
         #re.match(r'^#', resposta)
         if(texto != resposta):
             return texto
+
+
+def view_command():
+    rows = core.view()
+    app.listPedidos.delete(0, END)
+    for r in rows:
+        app.listPedidos.insert(END, r)
+
+def search_command():
+    app.listPedidos.delete(0, END)
+    rows = core.search(app.txtNome.get(), app.txtTamanho.get(), app.txtSabor1.get(), app.txtSabor2.get(), app.txtSabor3.get(), app.txtRefri.get(), app.txtBorda.get(), app.txtEndereco.get())
+    for r in rows:
+        app.listPedidos.insert(END, r)
+
+def insert_command():
+    core.insert(app.txtNome.get(), app.txtTamanho.get(), app.txtSabor1.get(), app.txtSabor2.get(), app.txtSabor3.get(), app.txtRefri.get(), app.txtBorda.get(), app.txtEndereco.get())
+    view_command()
+
+def update_command():
+    core.update(selected[0],app.txtNome.get(), app.txtTamanho.get(), app.txtSabor1.get(), app.txtSabor2.get(), app.txtSabor3.get(), app.txtRefri.get(), app.txtBorda.get(), app.txtEndereco.get())
+    view_command()
+
+def del_command():
+    id = selected[0]
+    core.delete(id)
+    view_command()
+
+
+def getSelectedRow(event):
+    global selected
+    index = app.listPedidos.curselection()[0]
+    selected = app.listPedidos.get(index)
+    app.entNome.delete(0, END)
+    app.entNome.insert(END, selected[1])
+    app.entTamanho.delete(0, END)
+    app.entTamanho.insert(END, selected[2])
+    app.entSabor1.delete(0, END)
+    app.entSabor1.insert(END, selected[3])
+    app.entSabor2.delete(0, END)
+    app.entSabor2.insert(END, selected[4])
+    app.entSabor3.delete(0, END)
+    app.entSabor3.insert(END, selected[5])
+    app.entRefri.delete(0, END)
+    app.entRefri.insert(END, selected[6])
+    app.entBorda.delete(0, END)
+    app.entBorda.insert(END, selected[7])
+    app.entEndereco.delete(0, END)
+    app.entEndereco.insert(END, selected[8])
+    return selected
+
+
+
 
 menu = {
     1: "AMERICANA",
@@ -616,22 +767,43 @@ menu = {
     19: "TOSCANA",
     20: "ALICHE"
 }
+
+
 tamanho = ''
 sabores = []
 borda = ''
 refri = ''
 borders = ['Catupiry', 'Cheddar', 'Calabresa', 'Queijo', 'Nutela']
 refrigerante = ['Coca-cola', 'Fanta', 'Sprite', 'Kuat', 'Guaraná Antartica']
+nome = ''
+endereco = ''
+
+
+
 
 bot.inicia()
+app = Gui()
+app.listPedidos.bind('<<ListboxSelect>>', getSelectedRow)
+
+app.btnViewAll.configure(command=view_command)
+app.btnBuscar.configure(command=search_command)
+app.btnInserir.configure(command=insert_command)
+app.btnUpdate.configure(command=update_command)
+app.btnDel.configure(command=del_command)
+app.btnClose.configure(command=app.window.destroy)
+
+
+
 while(True):
     
-    texto = str(bot.escuta())
-    if(texto == 'Fala bot!'):
-        saudacao(True) 
     
-    # bot.verifica_converca()
-    # # if(bot.verifica_converca()):
-    # #     saudacao(True)
-    # time.sleep(5)
-# saudacao()
+    texto = str(bot.escuta())
+    if(texto == 'Boa noite!'):
+        saudacao(True,0) 
+    
+print('Deseja finalizar o programa?\n1 - Sim.\n2 - Não')
+op = int(input())
+if op == 1:
+    bot.fecha()
+else:
+    print('Blz então, sabichão!')

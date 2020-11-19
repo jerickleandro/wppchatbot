@@ -3,27 +3,32 @@ import time
 import re
 import urllib.request
 from selenium import webdriver
-from bs4 import BeautifulSoup
 
 
 class wppbot:
+    #Pega o diretorio onde está salvo o arquivo wppbot.py
     dir_path = os.getcwd()
     
-
+    #Inicia o bot
     def __init__(self, nome_bot):
         print('Iniciado')
+        #salva o perfil para não precisar escanear 
         self.chrome = self.dir_path+'/chromedriver_linux64/chromedriver'
         self.options = webdriver.ChromeOptions()
         self.options.add_argument(
             r"user-data-dir="+self.dir_path+"/profile/wpp")
         self.driver = webdriver.Chrome(
             self.chrome, chrome_options=self.options)
-
+    
+    #Inicia o google chrome
     def inicia(self):
         #self.driver = webdriver.Chrome()
         self.driver.get('https://web.whatsapp.com/')
         self.driver.implicitly_wait(15)
-
+        
+    def fecha(self):
+        self.driver.close()
+    #esculta as conversas
     def verifica_converca(self):
         try:
             inicia = self.driver.find_elements_by_class_name('_19RFN')
@@ -40,7 +45,6 @@ class wppbot:
             self.verifica_converca()
     
     def escuta(self):
-        
         try:
             
             post = self.driver.find_elements_by_class_name('FTBzM')
@@ -56,7 +60,7 @@ class wppbot:
             response = str(resposta)
             self.caixa_de_mensagem = self.driver.find_element_by_class_name('_3FeAD')
             self.caixa_de_mensagem.send_keys(response)
-            time.sleep(1)
+            #time.sleep(1)
             self.botao_enviar = self.driver.find_element_by_class_name('_3M-N-')
             self.botao_enviar.click()
         except:
@@ -68,7 +72,7 @@ class wppbot:
             self.botao_anexo.click()
             #self.driver.implicitly_wait(5)
             self.busca_anexo = self.driver.find_element_by_css_selector("input[type='file']")
-            self.dir_path = self.dir_path+"/cardapio.png"
+            self.dir_path = self.dir_path+"/cardapio.jpeg"
             self.busca_anexo.send_keys(self.dir_path)
             #self.driver.implicitly_wait(5)
             #self.enviar_anexo = self.driver.find_element_by_css_selector("span[data-icon='send-light']")
